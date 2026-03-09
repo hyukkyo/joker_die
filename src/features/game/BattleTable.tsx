@@ -11,6 +11,7 @@ type BattleTableProps = {
     remainingTime: number;
     isDanger: boolean;
   };
+  onDismissRoundResult: () => void;
 };
 
 function impactLabel(state: GameState) {
@@ -29,7 +30,11 @@ function impactLabel(state: GameState) {
   return null;
 }
 
-export function BattleTable({ state, timer }: BattleTableProps) {
+export function BattleTable({
+  state,
+  timer,
+  onDismissRoundResult,
+}: BattleTableProps) {
   const latestImpactLabel = impactLabel(state);
   const isChoiceRevealPhase =
     !state.isComputerThinking &&
@@ -52,7 +57,7 @@ export function BattleTable({ state, timer }: BattleTableProps) {
       <div className="tableSurface">
         <header className="tableTopBar">
           <div>
-            <p className="eyebrow">Round {state.round}</p>
+            <p className="eyebrow tableRoundLabel">ROUND {state.round}</p>
           </div>
           <div className="tableStatusPills">
             <span className="statusBadge">
@@ -82,8 +87,14 @@ export function BattleTable({ state, timer }: BattleTableProps) {
         </div>
       </div>
       {state.isRoundResultVisible && state.latestRoundResult ? (
-        <div className="resultModalBackdrop">
-          <section className="resultModal">
+        <div className="resultModalBackdrop" onClick={onDismissRoundResult}>
+          <section
+            className="resultModal"
+            onClick={(event) => {
+              event.stopPropagation();
+              onDismissRoundResult();
+            }}
+          >
             <p className="sectionLabel">라운드 결과</p>
             <span>
               플레이어: {state.latestRoundResult.playerChoice ?? "-"} / 컴퓨터:{" "}
@@ -95,6 +106,7 @@ export function BattleTable({ state, timer }: BattleTableProps) {
             {latestImpactLabel ? (
               <span className="impactBanner">{latestImpactLabel}</span>
             ) : null}
+            <span className="modalHint">클릭하면 바로 닫힙니다</span>
           </section>
         </div>
       ) : null}

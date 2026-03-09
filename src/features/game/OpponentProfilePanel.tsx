@@ -20,12 +20,12 @@ export function OpponentProfilePanel({
       </div>
       <div className="opponentInfo">
         <div className="opponentTitleRow">
-          <p className="eyebrow">Opponent</p>
+          <p className="eyebrow opponentEyebrow">OPPONENT</p>
           <h2>컴퓨터</h2>
         </div>
       </div>
       <div className="opponentMeta opponentMetaSide">
-        <span className="statusBadge">체력 {hp}</span>
+        <span className="statusBadge hpBadge">체력 {hp}</span>
         <span className="statusBadge">
           {isThinking ? "선택 중..." : "대기 중"}
         </span>

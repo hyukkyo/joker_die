@@ -13,6 +13,7 @@ type GameScreenProps = {
   };
   onSelectChoice: (choice: Choice) => void;
   onRestart: () => void;
+  onDismissRoundResult: () => void;
 };
 
 export function GameScreen({
@@ -20,6 +21,7 @@ export function GameScreen({
   timer,
   onRestart,
   onSelectChoice,
+  onDismissRoundResult,
 }: GameScreenProps) {
   return (
     <main className="shell">
@@ -32,7 +34,11 @@ export function GameScreen({
           )}
         />
 
-        <BattleTable state={state} timer={timer} />
+        <BattleTable
+          state={state}
+          timer={timer}
+          onDismissRoundResult={onDismissRoundResult}
+        />
 
         <section className="playerHandSection">
           <div className="playerHandHeader">
@@ -41,7 +47,7 @@ export function GameScreen({
               <h2>플레이어</h2>
             </div>
             <div className="playerStatusChips">
-              <span className="statusBadge">체력 {state.playerHp}</span>
+              <span className="statusBadge hpBadge">체력 {state.playerHp}</span>
               <span className="statusBadge">
                 {state.isComputerThinking
                   ? "컴퓨터가 선택 중입니다..."

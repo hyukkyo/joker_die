@@ -38,6 +38,19 @@ export function useGameController() {
     dispatch({ type: "restartGame" });
   }
 
+  function dismissRoundResult() {
+    if (!state.isRoundResultVisible || state.phase !== "playing") {
+      return;
+    }
+
+    if (resultTimeoutRef.current !== null) {
+      window.clearTimeout(resultTimeoutRef.current);
+      resultTimeoutRef.current = null;
+    }
+
+    dispatch({ type: "finishRoundPresentation" });
+  }
+
   function playRound(playerChoice: Choice) {
     if (state.phase !== "playing" || state.isChoiceLocked || isResolvingRef.current) {
       return;
@@ -154,5 +167,6 @@ export function useGameController() {
     startGame,
     restartGame,
     playRound,
+    dismissRoundResult,
   };
 }

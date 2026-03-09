@@ -32,19 +32,19 @@ export function describeRoundResult(result: RoundResult): string {
       ) {
         const diff = Math.abs(result.playerChoice - result.computerChoice);
         if (diff === 1) {
-          return `차이가 1이라 큰 수를 낸 쪽이 두 수의 합 ${result.baseDamage} 피해를 받았습니다.`;
+          return `두 수의 차가 1이기 때문에 큰 쪽이 두 수의 합 ${result.baseDamage} 피해를 받았습니다.`;
         }
 
         if (result.playerChoice === 0 || result.computerChoice === 0) {
-          return `0은 숫자 카드에게 지므로 0을 낸 쪽이 ${result.baseDamage} 피해를 받았습니다.`;
+          return `0은 숫자 카드에게 지므로 0 쪽이 ${result.baseDamage} 피해를 받았습니다.`;
         }
 
-        return `차이가 ${diff}라 작은 수를 낸 쪽이 ${result.baseDamage} 피해를 받았습니다.`;
+        return `두 수의 차가 ${diff}이기 때문에 작은 쪽이 ${result.baseDamage} 피해를 받았습니다.`;
       }
 
       return `${result.baseDamage} 피해가 적용된 숫자 대결입니다.`;
     case "joker_vs_number":
-      return `Joker와 숫자가 만나 숫자를 낸 쪽이 자신의 숫자만큼 ${result.baseDamage} 피해를 받았습니다.`;
+      return `Joker와 숫자가 만나 숫자 쪽이 자신의 숫자만큼 ${result.baseDamage} 피해를 받았습니다.`;
     case "zero_vs_joker_instant_finish":
       return "0이 Joker를 만나 체력 계산 없이 즉시 승리했습니다.";
     case "same_number_draw":

@@ -8,10 +8,10 @@ export function StartScreen({ onStart }: StartScreenProps) {
       <section className="panel hero">
         <p className="eyebrow">사람 vs 컴퓨터 MVP</p>
         <h1>조커를 내고 지는 게임</h1>
-        <p className="muted">
+        {/* <p className="muted">
           숫자, 0, Joker 규칙이 섞인 심리전 카드 게임입니다. 지금 버전은 싱글 플레이
           MVP로, 전투 엔진과 타이머, 컴퓨터 AI까지 연결되어 있습니다.
-        </p>
+        </p> */}
         <div className="heroGrid">
           <article className="heroRuleCard">
             <span>기본 체력</span>

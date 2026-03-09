@@ -23,6 +23,7 @@ export function App() {
     <GameScreen
       state={controller.state}
       timer={controller.timer}
+      onDismissRoundResult={controller.dismissRoundResult}
       onRestart={controller.restartGame}
       onSelectChoice={controller.playRound}
     />
