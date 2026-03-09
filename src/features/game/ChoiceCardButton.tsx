@@ -25,9 +25,9 @@ export function ChoiceCardButton({
       onClick={() => onSelect(choice)}
       type="button"
     >
-      <span className="cardCorner top">{isJoker ? "J" : choice}</span>
+      {/* <span className="cardCorner top">{isJoker ? "J" : choice}</span> */}
       <span className="cardValue">{isJoker ? "JOKER" : choice}</span>
-      <span className="cardCorner bottom">{isJoker ? "J" : choice}</span>
+      {/* <span className="cardCorner bottom">{isJoker ? "J" : choice}</span> */}
     </button>
   );
 }
