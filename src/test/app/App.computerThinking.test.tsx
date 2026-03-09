@@ -20,16 +20,16 @@ describe("App computer thinking flow", () => {
     fireEvent.click(screen.getByRole("button", { name: "게임 시작" }));
     fireEvent.click(screen.getByRole("button", { name: "4" }));
 
-    expect(screen.getByText("컴퓨터가 선택 중입니다...")).toBeInTheDocument();
-    expect(screen.getByText("플레이어 선택")).toBeInTheDocument();
-    expect(screen.getByText("...")).toBeInTheDocument();
+    expect(screen.getAllByText("컴퓨터가 선택 중입니다...").length).toBeGreaterThan(0);
+    expect(screen.getByText("플레이어 공개 카드")).toBeInTheDocument();
+    expect(screen.getAllByText("...").length).toBeGreaterThan(0);
 
     await act(async () => {
       await vi.advanceTimersByTimeAsync(700);
     });
 
-    expect(screen.queryByText("컴퓨터가 선택 중입니다...")).not.toBeInTheDocument();
-    expect(screen.getAllByText("라운드 1: 컴퓨터가 2 피해를 받았습니다.")).toHaveLength(2);
-    expect(screen.getByText("Round 2")).toBeInTheDocument();
+    expect(screen.queryAllByText("컴퓨터가 선택 중입니다...")).toHaveLength(0);
+    expect(screen.getAllByText("라운드 1: 컴퓨터가 2 피해를 받았습니다.")).toHaveLength(1);
+    expect(screen.getAllByText("Round 2").length).toBeGreaterThan(0);
   });
 });

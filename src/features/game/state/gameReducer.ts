@@ -27,11 +27,27 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         ...state,
         isChoiceLocked: action.payload,
       };
+    case "finishRoundPresentation":
+      return {
+        ...state,
+        isChoiceLocked: false,
+        isRoundResultVisible: false,
+      };
+    case "revealComputerChoice":
+      return {
+        ...state,
+        isChoiceLocked: true,
+        isComputerThinking: false,
+        isRoundResultVisible: false,
+        playerChoice: action.payload.playerChoice,
+        computerChoice: action.payload.computerChoice,
+      };
     case "startComputerThinking":
       return {
         ...state,
         isChoiceLocked: true,
         isComputerThinking: true,
+        isRoundResultVisible: false,
         playerChoice: action.payload.playerChoice,
         computerChoice: null,
       };

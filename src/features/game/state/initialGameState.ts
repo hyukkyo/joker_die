@@ -14,6 +14,7 @@ export function createInitialGameState(): GameState {
     remainingTime: INITIAL_TIME_LIMIT,
     isChoiceLocked: true,
     isComputerThinking: false,
+    isRoundResultVisible: false,
     playerChoice: null,
     computerChoice: null,
     drawStreak: 0,

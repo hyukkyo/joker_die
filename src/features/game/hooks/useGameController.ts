@@ -6,12 +6,16 @@ import { gameReducer } from "../state/gameReducer";
 import { createInitialGameState } from "../state/initialGameState";
 import type { Choice } from "../types/round";
 
-const COMPUTER_THINK_DELAY_MS = 700;
+const COMPUTER_THINK_DELAY_MS = 500;
+const RESULT_REVEAL_DELAY_MS = 1000;
+const ROUND_RESULT_VISIBLE_MS = 5000;
 
 export function useGameController() {
   const [state, dispatch] = useReducer(gameReducer, undefined, createInitialGameState);
   const isResolvingRef = useRef(false);
   const thinkTimeoutRef = useRef<number | null>(null);
+  const revealTimeoutRef = useRef<number | null>(null);
+  const resultTimeoutRef = useRef<number | null>(null);
 
   function startGame() {
     dispatch({ type: "startGame" });
@@ -22,6 +26,14 @@ export function useGameController() {
     if (thinkTimeoutRef.current !== null) {
       window.clearTimeout(thinkTimeoutRef.current);
       thinkTimeoutRef.current = null;
+    }
+    if (revealTimeoutRef.current !== null) {
+      window.clearTimeout(revealTimeoutRef.current);
+      revealTimeoutRef.current = null;
+    }
+    if (resultTimeoutRef.current !== null) {
+      window.clearTimeout(resultTimeoutRef.current);
+      resultTimeoutRef.current = null;
     }
     dispatch({ type: "restartGame" });
   }
@@ -44,19 +56,37 @@ export function useGameController() {
         state,
         playerChoice,
       });
-      const result = resolveRound({
-        round: state.round,
-        playerHp: state.playerHp,
-        computerHp: state.computerHp,
-        playerChoice,
-        computerChoice,
-        drawStreak: state.drawStreak,
-        doubleDamageActive: state.doubleDamageActive,
+      dispatch({
+        type: "revealComputerChoice",
+        payload: {
+          playerChoice,
+          computerChoice,
+        },
       });
 
-      dispatch({ type: "applyRound", payload: result });
+      revealTimeoutRef.current = window.setTimeout(() => {
+        const result = resolveRound({
+          round: state.round,
+          playerHp: state.playerHp,
+          computerHp: state.computerHp,
+          playerChoice,
+          computerChoice,
+          drawStreak: state.drawStreak,
+          doubleDamageActive: state.doubleDamageActive,
+        });
+
+        dispatch({ type: "applyRound", payload: result });
+        if (!result.matchEnd) {
+          resultTimeoutRef.current = window.setTimeout(() => {
+            dispatch({ type: "finishRoundPresentation" });
+            resultTimeoutRef.current = null;
+          }, ROUND_RESULT_VISIBLE_MS);
+        }
+        revealTimeoutRef.current = null;
+        isResolvingRef.current = false;
+      }, RESULT_REVEAL_DELAY_MS);
+
       thinkTimeoutRef.current = null;
-      isResolvingRef.current = false;
     }, COMPUTER_THINK_DELAY_MS);
   }
 
@@ -79,6 +109,12 @@ export function useGameController() {
     });
 
     dispatch({ type: "applyRound", payload: result });
+    if (!result.matchEnd) {
+      resultTimeoutRef.current = window.setTimeout(() => {
+        dispatch({ type: "finishRoundPresentation" });
+        resultTimeoutRef.current = null;
+      }, ROUND_RESULT_VISIBLE_MS);
+    }
     isResolvingRef.current = false;
   });
 
@@ -102,6 +138,12 @@ export function useGameController() {
     return () => {
       if (thinkTimeoutRef.current !== null) {
         window.clearTimeout(thinkTimeoutRef.current);
+      }
+      if (revealTimeoutRef.current !== null) {
+        window.clearTimeout(revealTimeoutRef.current);
+      }
+      if (resultTimeoutRef.current !== null) {
+        window.clearTimeout(resultTimeoutRef.current);
       }
     };
   }, []);

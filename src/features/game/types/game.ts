@@ -10,6 +10,7 @@ export type GameState = {
   remainingTime: number;
   isChoiceLocked: boolean;
   isComputerThinking: boolean;
+  isRoundResultVisible: boolean;
   playerChoice: Choice | null;
   computerChoice: Choice | null;
   drawStreak: number;
@@ -25,6 +26,14 @@ export type GameAction =
   | { type: "restartGame" }
   | { type: "tickTimer" }
   | { type: "setChoiceLocked"; payload: boolean }
+  | { type: "finishRoundPresentation" }
+  | {
+      type: "revealComputerChoice";
+      payload: {
+        playerChoice: Choice;
+        computerChoice: Choice;
+      };
+    }
   | {
       type: "startComputerThinking";
       payload: {

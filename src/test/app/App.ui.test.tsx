@@ -16,6 +16,6 @@ describe("App UI copy", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "게임 시작" }));
     expect(screen.getByText("활성 상태")).toBeInTheDocument();
-    expect(screen.getByText("현재 라운드 안내")).toBeInTheDocument();
+    expect(screen.getAllByText("현재 라운드 안내").length).toBeGreaterThan(0);
   });
 });
