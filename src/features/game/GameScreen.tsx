@@ -1,7 +1,11 @@
 import type { GameState } from "./types/game";
 import type { Choice } from "./types/round";
 import { PLAYER_CHOICES } from "./utils/constants";
-import { formatRoundLog } from "./utils/logMessages";
+import {
+  describeMultiplier,
+  describeRoundResult,
+  formatRoundLog,
+} from "./utils/logMessages";
 
 type GameScreenProps = {
   state: GameState;
@@ -53,6 +57,27 @@ export function GameScreen({
           </article>
         </section>
 
+        <section className="battleMetaGrid">
+          <article className="metaCard">
+            <span>활성 상태</span>
+            <div className="badgeRow">
+              <span className="statusBadge">{state.doubleDamageActive ? "다음 피해 2x 준비" : "기본 배율"}</span>
+              <span className="statusBadge">{state.drawStreak > 0 ? `연속 무승부 ${state.drawStreak}` : "무승부 누적 없음"}</span>
+              <span className="statusBadge">{state.isComputerThinking ? "컴퓨터 생각 중" : "입력 가능"}</span>
+            </div>
+          </article>
+          <article className="metaCard">
+            <span>현재 라운드 안내</span>
+            <p className="metaCopy">
+              {state.isComputerThinking
+                ? "플레이어 선택이 제출되었습니다. 잠시 후 컴퓨터 선택과 결과가 공개됩니다."
+                : timer.isDanger
+                  ? "남은 시간이 거의 없습니다. 지금 선택하지 않으면 시간 초과 패널티를 받습니다."
+                  : "라운드마다 카드 1장을 선택해 상대보다 먼저 체력을 0으로 만들면 됩니다."}
+            </p>
+          </article>
+        </section>
+
         <section className="choiceSection">
           <p className="sectionLabel">카드를 선택하세요</p>
           <p className="muted">
@@ -100,6 +125,17 @@ export function GameScreen({
                 {state.latestRoundResult.computerChoice ?? "-"}
               </span>
               <strong>{formatRoundLog(state.latestRoundResult)}</strong>
+              <p className="detailCopy">
+                {describeRoundResult(state.latestRoundResult)}
+              </p>
+              <p className="detailCopy">
+                {describeMultiplier(state.latestRoundResult)}
+              </p>
+              {state.latestRoundResult.instantFinish ? (
+                <span className="impactBanner">즉시 승리 규칙 발동</span>
+              ) : state.latestRoundResult.nextRoundDoubleDamage ? (
+                <span className="impactBanner">다음 라운드 2배 피해 활성</span>
+              ) : null}
             </div>
           ) : (
             <p className="muted">아직 진행된 라운드가 없습니다.</p>
@@ -108,7 +144,8 @@ export function GameScreen({
           <ul className="logList">
             {state.roundLogs.map((log) => (
               <li key={`${log.round}-${log.resultType}-${log.logKey}`}>
-                {formatRoundLog(log)}
+                <strong>{formatRoundLog(log)}</strong>
+                <span>{describeRoundResult(log)}</span>
               </li>
             ))}
           </ul>

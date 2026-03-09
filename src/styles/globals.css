@@ -92,6 +92,58 @@ button {
   padding: 28px;
 }
 
+.heroGrid,
+.resultGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 28px;
+  text-align: left;
+}
+
+.heroRuleCard {
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  padding: 18px;
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.heroRuleCard span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.heroRuleCard strong {
+  display: block;
+  margin-top: 10px;
+  font-size: 1.5rem;
+}
+
+.heroRuleCard p {
+  margin: 10px 0 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.ruleStrip,
+.resultSummary {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.ruleStrip span,
+.resultSummary span,
+.resultSummary strong {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.6);
+}
+
 .gameHeader {
   display: flex;
   align-items: flex-start;
@@ -106,7 +158,15 @@ button {
   margin-top: 28px;
 }
 
+.battleMetaGrid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 12px;
+  margin-top: 18px;
+}
+
 .statusCard,
+.metaCard,
 .logPanel,
 .choiceSection {
   border: 1px solid var(--line);
@@ -134,6 +194,51 @@ button {
 .logPanel {
   margin-top: 18px;
   padding: 18px;
+}
+
+.metaCard {
+  padding: 18px;
+}
+
+.metaCard > span {
+  display: block;
+  margin-bottom: 12px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.metaCopy,
+.detailCopy {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.badgeRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.statusBadge,
+.impactBanner {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.statusBadge {
+  background: rgba(28, 107, 93, 0.1);
+  color: var(--secondary);
+}
+
+.impactBanner {
+  width: fit-content;
+  background: rgba(184, 79, 44, 0.14);
+  color: var(--primary-strong);
 }
 
 .revealRow {
@@ -202,6 +307,16 @@ button {
   color: var(--muted);
 }
 
+.logList li + li {
+  margin-top: 12px;
+}
+
+.logList li span {
+  display: block;
+  margin-top: 4px;
+  line-height: 1.45;
+}
+
 @media (max-width: 720px) {
   .gameBoard {
     padding: 20px;
@@ -213,6 +328,12 @@ button {
 
   .statusGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .battleMetaGrid,
+  .heroGrid,
+  .resultGrid {
+    grid-template-columns: 1fr;
   }
 
   .choiceGrid {
