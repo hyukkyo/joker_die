@@ -1,0 +1,186 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  font-family: "Pretendard", "Noto Sans KR", sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.7), transparent 32%),
+    linear-gradient(160deg, var(--bg) 0%, var(--bg-accent) 100%);
+}
+
+button {
+  font: inherit;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.shell {
+  display: flex;
+  justify-content: center;
+  padding: 32px 16px;
+}
+
+.panel {
+  width: min(960px, 100%);
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(10px);
+}
+
+.hero {
+  padding: 56px 28px;
+  text-align: center;
+}
+
+.hero h1,
+.gameHeader h1 {
+  margin: 0 0 12px;
+  font-size: clamp(2rem, 4vw, 3.5rem);
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  color: var(--secondary);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.primaryButton,
+.secondaryButton,
+.choiceButton {
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: transform 120ms ease, opacity 120ms ease;
+}
+
+.primaryButton:hover,
+.secondaryButton:hover,
+.choiceButton:hover {
+  transform: translateY(-1px);
+}
+
+.primaryButton {
+  margin-top: 24px;
+  padding: 14px 24px;
+  background: var(--primary);
+  color: white;
+}
+
+.secondaryButton {
+  padding: 10px 18px;
+  background: rgba(28, 107, 93, 0.1);
+  color: var(--secondary);
+}
+
+.gameBoard {
+  padding: 28px;
+}
+
+.gameHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.statusGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.statusCard,
+.logPanel,
+.choiceSection {
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.statusCard {
+  padding: 16px;
+}
+
+.statusCard span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.statusCard strong {
+  display: block;
+  margin-top: 8px;
+  font-size: 1.8rem;
+}
+
+.choiceSection,
+.logPanel {
+  margin-top: 18px;
+  padding: 18px;
+}
+
+.sectionLabel {
+  margin: 0 0 12px;
+  font-weight: 700;
+}
+
+.choiceGrid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.choiceButton {
+  padding: 18px 12px;
+  background: #fffaf1;
+  color: var(--text);
+  border: 1px solid var(--line);
+}
+
+.latestResult {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.logList {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted);
+}
+
+@media (max-width: 720px) {
+  .gameBoard {
+    padding: 20px;
+  }
+
+  .gameHeader {
+    flex-direction: column;
+  }
+
+  .statusGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .choiceGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
