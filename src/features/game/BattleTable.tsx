@@ -61,7 +61,7 @@ export function BattleTable({
           </div>
           <div className="tableStatusPills">
             <span className="statusBadge">
-              {state.doubleDamageActive ? "다음 피해 2x 준비" : "기본 배율"}
+              {state.doubleDamageActive ? "다음 피해 2배 준비" : "피해량 1배"}
             </span>
             <span className="statusBadge">
               {state.drawStreak > 0

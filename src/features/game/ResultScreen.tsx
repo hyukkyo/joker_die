@@ -1,9 +1,18 @@
 import type { GameState } from "./types/game";
-import { formatEndReason } from "./utils/logMessages";
+import {
+  describeMultiplier,
+  describeRoundResult,
+  formatEndReason,
+  formatRoundLog,
+} from "./utils/logMessages";
 
 type ResultScreenProps = {
   state: GameState;
   onRestart: () => void;
+  record: {
+    wins: number;
+    losses: number;
+  };
 };
 
 function titleForWinner(state: GameState) {
@@ -18,7 +27,7 @@ function titleForWinner(state: GameState) {
   return "게임 종료";
 }
 
-export function ResultScreen({ state, onRestart }: ResultScreenProps) {
+export function ResultScreen({ state, onRestart, record }: ResultScreenProps) {
   return (
     <main className="shell">
       <section className="panel hero">
@@ -32,24 +41,43 @@ export function ResultScreen({ state, onRestart }: ResultScreenProps) {
             <p>플레이어</p>
           </article>
           <article className="heroRuleCard">
-            <span>최종 체력</span>
-            <strong>{state.computerHp}</strong>
-            <p>컴퓨터</p>
-          </article>
-          <article className="heroRuleCard">
             <span>진행 라운드</span>
             <strong>{state.round}</strong>
             <p>종료 시점 라운드</p>
           </article>
+          <article className="heroRuleCard">
+            <span>최종 체력</span>
+            <strong>{state.computerHp}</strong>
+            <p>컴퓨터</p>
+          </article>
         </div>
-        {state.latestRoundResult ? (
-          <div className="resultSummary">
-            <span>마지막 라운드</span>
-            <strong>
-              플레이어 {state.latestRoundResult.playerChoice ?? "-"} / 컴퓨터{" "}
-              {state.latestRoundResult.computerChoice ?? "-"}
-            </strong>
-          </div>
+        <div className="resultSummary">
+          <span>
+            현재 전적 {record.wins}승 {record.losses}패
+          </span>
+          {/* {state.latestRoundResult ? (
+            <>
+              <span>마지막 라운드</span>
+              <strong>
+                플레이어 {state.latestRoundResult.playerChoice ?? "-"} / 컴퓨터{" "}
+                {state.latestRoundResult.computerChoice ?? "-"}
+              </strong>
+            </>
+          ) : null} */}
+        </div>
+        {state.roundLogs.length > 0 ? (
+          <section className="resultLogPanel">
+            <p className="sectionLabel">전체 라운드 로그</p>
+            <ol className="logList resultLogList">
+              {state.roundLogs.map((result) => (
+                <li key={`${result.round}-${result.logKey}`}>
+                  <strong>{formatRoundLog(result)}</strong>
+                  <span>{describeRoundResult(result)}</span>
+                  <span>{describeMultiplier(result)}</span>
+                </li>
+              ))}
+            </ol>
+          </section>
         ) : null}
         <button className="primaryButton" onClick={onRestart} type="button">
           다시 시작

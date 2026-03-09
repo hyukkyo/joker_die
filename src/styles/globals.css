@@ -157,6 +157,15 @@ button {
   background: rgba(255, 255, 255, 0.6);
 }
 
+.resultLogPanel {
+  margin-top: 24px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.55);
+  text-align: left;
+}
+
 .gameHeader {
   display: flex;
   align-items: flex-start;
@@ -506,6 +515,17 @@ button {
 .logList li span {
   display: block;
   margin-top: 4px;
+  line-height: 1.45;
+}
+
+.resultLogList {
+  max-height: 320px;
+  overflow: auto;
+}
+
+.resultLogList li strong {
+  display: block;
+  color: var(--text);
   line-height: 1.45;
 }
 

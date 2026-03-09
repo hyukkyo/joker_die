@@ -7,7 +7,7 @@ import { createInitialGameState } from "../state/initialGameState";
 import type { Choice } from "../types/round";
 
 const COMPUTER_THINK_DELAY_MS = 500;
-const RESULT_REVEAL_DELAY_MS = 1000;
+const RESULT_REVEAL_DELAY_MS = 500;
 const ROUND_RESULT_VISIBLE_MS = 5000;
 
 export function useGameController() {
