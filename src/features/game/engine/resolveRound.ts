@@ -40,7 +40,7 @@ export function resolveRound(context: RoundContext): RoundResult {
     const matchEnd = matchWinner !== "none";
     const drawCountAfterRound = outcome.drawIncrement ? context.drawStreak + 1 : 0;
     const nextRoundDoubleDamage =
-      outcome.zeroZeroTriggered ||
+      // outcome.zeroZeroTriggered ||
       drawCountAfterRound >= 3 ||
       context.round + 1 >= 16;
 
