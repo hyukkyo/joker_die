@@ -7,6 +7,16 @@ type WeightedOption = {
   weight: number;
 };
 
+type PlayerTendency = {
+  sampleSize: number;
+  jokerScore: number;
+  zeroScore: number;
+  lowNumberScore: number;
+  highNumberScore: number;
+  repeatedChoice: Choice | null;
+  likelyChoice: Choice | null;
+};
+
 function clampWeight(weight: number) {
   return Math.max(1, weight);
 }
@@ -119,49 +129,144 @@ function applyDrawStreakWeights(option: WeightedOption, state: GameState) {
   }
 }
 
-function applyHistoryWeights(option: WeightedOption, state: GameState) {
+function analyzePlayerTendency(state: GameState): PlayerTendency {
   const recentPlayerChoices = state.roundLogs
     .slice(-5)
     .map((round) => round.playerChoice)
     .filter((choice): choice is Choice => choice !== null);
 
   if (recentPlayerChoices.length === 0) {
+    return {
+      sampleSize: 0,
+      jokerScore: 0,
+      zeroScore: 0,
+      lowNumberScore: 0,
+      highNumberScore: 0,
+      repeatedChoice: null,
+      likelyChoice: null,
+    };
+  }
+
+  const weightedChoices = recentPlayerChoices.map((choice, index) => ({
+    choice,
+    weight: index + 1,
+  }));
+
+  let jokerScore = 0;
+  let zeroScore = 0;
+  let lowNumberScore = 0;
+  let highNumberScore = 0;
+  const choiceScores = new Map<Choice, number>();
+
+  for (const entry of weightedChoices) {
+    choiceScores.set(
+      entry.choice,
+      (choiceScores.get(entry.choice) ?? 0) + entry.weight,
+    );
+
+    if (entry.choice === "Joker") {
+      jokerScore += entry.weight;
+    } else if (entry.choice === 0) {
+      zeroScore += entry.weight;
+    } else if (entry.choice <= 3) {
+      lowNumberScore += entry.weight;
+    } else {
+      highNumberScore += entry.weight;
+    }
+  }
+
+  const lastChoice = recentPlayerChoices[recentPlayerChoices.length - 1];
+  const previousChoice = recentPlayerChoices[recentPlayerChoices.length - 2];
+  const repeatedChoice =
+    previousChoice !== undefined && lastChoice === previousChoice
+      ? lastChoice
+      : null;
+
+  let likelyChoice: Choice | null = null;
+  let highestScore = 0;
+  for (const [choice, score] of choiceScores) {
+    if (score > highestScore) {
+      likelyChoice = choice;
+      highestScore = score;
+    }
+  }
+
+  return {
+    sampleSize: recentPlayerChoices.length,
+    jokerScore,
+    zeroScore,
+    lowNumberScore,
+    highNumberScore,
+    repeatedChoice,
+    likelyChoice,
+  };
+}
+
+function applyPredictionWeights(
+  option: WeightedOption,
+  tendency: PlayerTendency,
+  state: GameState,
+) {
+  if (tendency.sampleSize === 0) {
     return;
   }
 
-  const jokerCount = recentPlayerChoices.filter(
-    (choice) => choice === "Joker",
-  ).length;
-  const zeroCount = recentPlayerChoices.filter((choice) => choice === 0).length;
-  const numbers = recentPlayerChoices.filter(isNumberChoice);
-  const lowNumberCount = numbers.filter((choice) => choice <= 3).length;
-  const highNumberCount = numbers.filter((choice) => choice >= 4).length;
+  const confidenceBonus = tendency.sampleSize >= 4 ? 1.2 : 1;
+  const jokerHeavy = tendency.jokerScore >= 5 * confidenceBonus;
+  const zeroHeavy = tendency.zeroScore >= 5 * confidenceBonus;
+  const highNumberHeavy =
+    tendency.highNumberScore > tendency.lowNumberScore + 2 * confidenceBonus;
+  const lowNumberHeavy =
+    tendency.lowNumberScore > tendency.highNumberScore + 2 * confidenceBonus;
 
-  if (jokerCount >= 2 && option.choice === 0) {
+  if (jokerHeavy && option.choice === 0) {
     option.weight += 8;
   }
 
-  if (zeroCount >= 2 && option.choice === "Joker") {
-    option.weight -= 6;
+  if (zeroHeavy && option.choice === "Joker") {
+    option.weight -= 7;
   }
 
-  if (highNumberCount > lowNumberCount) {
+  if (highNumberHeavy) {
     if (option.choice === 2 || option.choice === 3) {
       option.weight += 4;
     } else if (option.choice === 5) {
       option.weight -= 2;
     }
-  } else if (lowNumberCount > highNumberCount) {
+  } else if (lowNumberHeavy) {
     if (option.choice === 4 || option.choice === 5) {
       option.weight += 4;
     } else if (option.choice === 2) {
       option.weight -= 2;
     }
   }
+
+  if (tendency.repeatedChoice === "Joker" && option.choice === 0) {
+    option.weight += 10;
+  } else if (tendency.repeatedChoice === 0 && option.choice === "Joker") {
+    option.weight -= 8;
+  } else if (tendency.repeatedChoice === 5 && option.choice === 3) {
+    option.weight += 3;
+  } else if (tendency.repeatedChoice === 4 && option.choice === 2) {
+    option.weight += 3;
+  } else if (tendency.repeatedChoice === 2 && option.choice === 4) {
+    option.weight += 3;
+  } else if (tendency.repeatedChoice === 3 && option.choice === 5) {
+    option.weight += 3;
+  }
+
+  if (state.playerHp <= 7 && tendency.likelyChoice === "Joker" && option.choice === 0) {
+    option.weight += 8;
+  }
+
+  if (state.computerHp <= 7 && tendency.likelyChoice === 0 && option.choice === "Joker") {
+    option.weight -= 6;
+  }
 }
 
 export function weightedAi(params: { state: GameState }): Choice {
   const { state } = params;
+  const tendency = analyzePlayerTendency(state);
 
   const options: WeightedOption[] = PLAYER_CHOICES.map((choice) => ({
     choice,
@@ -173,7 +278,7 @@ export function weightedAi(params: { state: GameState }): Choice {
     applyHealthWeights(option, state);
     applyMultiplierWeights(option, state);
     applyDrawStreakWeights(option, state);
-    applyHistoryWeights(option, state);
+    applyPredictionWeights(option, tendency, state);
     option.weight = clampWeight(option.weight);
   }
 
