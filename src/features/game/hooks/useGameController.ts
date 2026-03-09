@@ -67,7 +67,6 @@ export function useGameController() {
     thinkTimeoutRef.current = window.setTimeout(() => {
       const computerChoice = weightedAi({
         state,
-        playerChoice,
       });
       dispatch({
         type: "revealComputerChoice",

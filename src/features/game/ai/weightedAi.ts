@@ -11,11 +11,157 @@ function clampWeight(weight: number) {
   return Math.max(1, weight);
 }
 
-export function weightedAi(params: {
-  state: GameState;
-  playerChoice: Choice;
-}): Choice {
-  const { playerChoice, state } = params;
+function isNumberChoice(choice: Choice): choice is Exclude<Choice, "Joker"> {
+  return typeof choice === "number";
+}
+
+function applyBaseWeights(option: WeightedOption) {
+  if (option.choice === 0) {
+    option.weight -= 3;
+    return;
+  }
+
+  if (option.choice === "Joker") {
+    option.weight -= 1;
+    return;
+  }
+
+  if (option.choice === 3 || option.choice === 4) {
+    option.weight += 3;
+    return;
+  }
+
+  if (option.choice === 2 || option.choice === 5) {
+    option.weight += 1;
+  }
+}
+
+function applyHealthWeights(option: WeightedOption, state: GameState) {
+  const hpGap = state.computerHp - state.playerHp;
+
+  if (state.computerHp <= 7) {
+    if (option.choice === 0) {
+      option.weight -= 4;
+    } else if (option.choice === "Joker") {
+      option.weight -= 5;
+    } else if (option.choice === 3 || option.choice === 4) {
+      option.weight += 8;
+    } else {
+      option.weight += 3;
+    }
+  }
+
+  if (state.playerHp <= 7) {
+    if (option.choice === "Joker") {
+      option.weight += 7;
+    } else if (option.choice === 5) {
+      option.weight += 6;
+    } else if (option.choice === 4) {
+      option.weight += 3;
+    }
+  }
+
+  if (hpGap >= 6) {
+    if (option.choice === "Joker") {
+      option.weight -= 4;
+    } else if (option.choice === 0) {
+      option.weight -= 2;
+    } else if (option.choice === 3 || option.choice === 4) {
+      option.weight += 4;
+    }
+  } else if (hpGap <= -6) {
+    if (option.choice === "Joker") {
+      option.weight += 6;
+    } else if (option.choice === 5) {
+      option.weight += 4;
+    } else if (option.choice === 0) {
+      option.weight += 2;
+    }
+  }
+}
+
+function applyMultiplierWeights(option: WeightedOption, state: GameState) {
+  if (!state.doubleDamageActive) {
+    return;
+  }
+
+  if (state.computerHp <= state.playerHp) {
+    if (option.choice === "Joker") {
+      option.weight += 8;
+    } else if (option.choice === 5) {
+      option.weight += 5;
+    } else if (option.choice === 4) {
+      option.weight += 2;
+    }
+    return;
+  }
+
+  if (option.choice === "Joker") {
+    option.weight -= 6;
+  } else if (option.choice === 0) {
+    option.weight -= 2;
+  } else if (option.choice === 3 || option.choice === 4) {
+    option.weight += 5;
+  }
+}
+
+function applyDrawStreakWeights(option: WeightedOption, state: GameState) {
+  if (state.drawStreak < 2) {
+    return;
+  }
+
+  if (option.choice === "Joker") {
+    option.weight += 4;
+  } else if (option.choice === 5) {
+    option.weight += 3;
+  } else if (option.choice === 0) {
+    option.weight += 1;
+  }
+}
+
+function applyHistoryWeights(option: WeightedOption, state: GameState) {
+  const recentPlayerChoices = state.roundLogs
+    .slice(-5)
+    .map((round) => round.playerChoice)
+    .filter((choice): choice is Choice => choice !== null);
+
+  if (recentPlayerChoices.length === 0) {
+    return;
+  }
+
+  const jokerCount = recentPlayerChoices.filter(
+    (choice) => choice === "Joker",
+  ).length;
+  const zeroCount = recentPlayerChoices.filter((choice) => choice === 0).length;
+  const numbers = recentPlayerChoices.filter(isNumberChoice);
+  const lowNumberCount = numbers.filter((choice) => choice <= 3).length;
+  const highNumberCount = numbers.filter((choice) => choice >= 4).length;
+
+  if (jokerCount >= 2 && option.choice === 0) {
+    option.weight += 8;
+  }
+
+  if (zeroCount >= 2 && option.choice === "Joker") {
+    option.weight -= 6;
+  }
+
+  if (highNumberCount > lowNumberCount) {
+    if (option.choice === 2 || option.choice === 3) {
+      option.weight += 4;
+    } else if (option.choice === 5) {
+      option.weight -= 2;
+    }
+  } else if (lowNumberCount > highNumberCount) {
+    if (option.choice === 4 || option.choice === 5) {
+      option.weight += 4;
+    } else if (option.choice === 2) {
+      option.weight -= 2;
+    }
+  }
+}
+
+export function weightedAi(params: { state: GameState }): Choice {
+  const { state } = params;
 
   const options: WeightedOption[] = PLAYER_CHOICES.map((choice) => ({
     choice,
@@ -23,53 +169,11 @@ export function weightedAi(params: {
   }));
 
   for (const option of options) {
-    if (option.choice === 0) {
-      option.weight -= 5;
-    }
-
-    if (playerChoice === "Joker" && option.choice === 0) {
-      option.weight += 40;
-    }
-
-    if (playerChoice === 0 && option.choice === "Joker") {
-      option.weight -= 8;
-    }
-
-    if (state.doubleDamageActive && option.choice === "Joker") {
-      option.weight += 8;
-    }
-
-    if (
-      state.playerHp <= 7 &&
-      typeof playerChoice === "number" &&
-      option.choice === playerChoice + 1
-    ) {
-      option.weight += 18;
-    }
-
-    if (
-      state.computerHp <= 7 &&
-      typeof playerChoice === "number" &&
-      option.choice === playerChoice - 1
-    ) {
-      option.weight += 6;
-    }
-
-    if (
-      typeof playerChoice === "number" &&
-      typeof option.choice === "number" &&
-      playerChoice !== 0 &&
-      option.choice !== 0
-    ) {
-      if (Math.abs(playerChoice - option.choice) === 1) {
-        option.weight += 10;
-      }
-
-      if (option.choice < playerChoice && playerChoice - option.choice > 1) {
-        option.weight += 4;
-      }
-    }
-
+    applyBaseWeights(option);
+    applyHealthWeights(option, state);
+    applyMultiplierWeights(option, state);
+    applyDrawStreakWeights(option, state);
+    applyHistoryWeights(option, state);
     option.weight = clampWeight(option.weight);
   }
 
