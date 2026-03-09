@@ -102,7 +102,7 @@ export function BattleTable({
             </span>
             <strong>{formatRoundLog(state.latestRoundResult)}</strong>
             <p className="detailCopy">{describeRoundResult(state.latestRoundResult)}</p>
-            <p className="detailCopy">{describeMultiplier(state.latestRoundResult)}</p>
+            {/* <p className="detailCopy">{describeMultiplier(state.latestRoundResult)}</p> */}
             {latestImpactLabel ? (
               <span className="impactBanner">{latestImpactLabel}</span>
             ) : null}

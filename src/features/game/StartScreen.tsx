@@ -53,7 +53,7 @@ export function StartScreen({ onStart, record }: StartScreenProps) {
         </div>
         <div className="ruleStrip">
           {/* <span>선택지: 0, 2, 3, 4, 5, Joker</span> */}
-          <span>무승부 3연속 또는 16라운드부터 피해량 2배</span>
+          <span>3연속 무승부 또는 16라운드부터 피해량 2배</span>
         </div>
         <button className="primaryButton" onClick={onStart} type="button">
           게임 시작
