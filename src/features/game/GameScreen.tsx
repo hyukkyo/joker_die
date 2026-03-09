@@ -5,12 +5,17 @@ import { formatRoundLog } from "./utils/logMessages";
 
 type GameScreenProps = {
   state: GameState;
+  timer: {
+    remainingTime: number;
+    isDanger: boolean;
+  };
   onSelectChoice: (choice: Choice) => void;
   onRestart: () => void;
 };
 
 export function GameScreen({
   state,
+  timer,
   onRestart,
   onSelectChoice,
 }: GameScreenProps) {
@@ -42,17 +47,41 @@ export function GameScreen({
           </article>
           <article className="statusCard">
             <span>타이머</span>
-            <strong>다음 단계 구현</strong>
+            <strong className={timer.isDanger ? "dangerText" : undefined}>
+              {timer.remainingTime}초
+            </strong>
           </article>
         </section>
 
         <section className="choiceSection">
           <p className="sectionLabel">카드를 선택하세요</p>
+          <p className="muted">
+            {state.isComputerThinking
+              ? "컴퓨터가 선택 중입니다..."
+              : state.isChoiceLocked
+                ? "현재 라운드를 정리 중입니다."
+              : timer.isDanger
+                ? "5초 이하입니다. 선택을 서두르세요."
+                : "30초 안에 한 장을 선택해야 합니다."}
+          </p>
+          {(state.playerChoice !== null || state.isComputerThinking) && (
+            <div className="revealRow">
+              <div className="revealCard">
+                <span>플레이어 선택</span>
+                <strong>{state.playerChoice ?? "-"}</strong>
+              </div>
+              <div className="revealCard">
+                <span>컴퓨터 선택</span>
+                <strong>{state.isComputerThinking ? "..." : state.computerChoice ?? "-"}</strong>
+              </div>
+            </div>
+          )}
           <div className="choiceGrid">
             {PLAYER_CHOICES.map((choice) => (
               <button
                 key={choice}
                 className="choiceButton"
+                disabled={state.isChoiceLocked}
                 onClick={() => onSelectChoice(choice)}
                 type="button"
               >
@@ -67,8 +96,8 @@ export function GameScreen({
           {state.latestRoundResult ? (
             <div className="latestResult">
               <span>
-                플레이어: {String(state.latestRoundResult.playerChoice)} / 컴퓨터:{" "}
-                {String(state.latestRoundResult.computerChoice)}
+                플레이어: {state.latestRoundResult.playerChoice ?? "-"} / 컴퓨터:{" "}
+                {state.latestRoundResult.computerChoice ?? "-"}
               </span>
               <strong>{formatRoundLog(state.latestRoundResult)}</strong>
             </div>
@@ -88,4 +117,3 @@ export function GameScreen({
     </main>
   );
 }
-

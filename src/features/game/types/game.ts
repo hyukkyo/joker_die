@@ -8,6 +8,8 @@ export type GameState = {
   playerHp: number;
   computerHp: number;
   remainingTime: number;
+  isChoiceLocked: boolean;
+  isComputerThinking: boolean;
   playerChoice: Choice | null;
   computerChoice: Choice | null;
   drawStreak: number;
@@ -21,5 +23,12 @@ export type GameState = {
 export type GameAction =
   | { type: "startGame" }
   | { type: "restartGame" }
+  | { type: "tickTimer" }
+  | { type: "setChoiceLocked"; payload: boolean }
+  | {
+      type: "startComputerThinking";
+      payload: {
+        playerChoice: Choice;
+      };
+    }
   | { type: "applyRound"; payload: RoundResult };
-

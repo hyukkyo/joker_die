@@ -1,5 +1,6 @@
 import type { GameState } from "../types/game";
 import type { RoundResult } from "../types/round";
+import { INITIAL_TIME_LIMIT } from "../utils/constants";
 
 export function computeNextRoundState(
   state: GameState,
@@ -20,6 +21,9 @@ export function computeNextRoundState(
     round: result.matchEnd ? state.round : state.round + 1,
     playerHp,
     computerHp,
+    remainingTime: result.matchEnd ? 0 : INITIAL_TIME_LIMIT,
+    isChoiceLocked: result.matchEnd,
+    isComputerThinking: false,
     playerChoice: null,
     computerChoice: null,
     drawStreak: result.drawCountAfterRound,
@@ -30,4 +34,3 @@ export function computeNextRoundState(
     endReason: result.endReason,
   };
 }
-

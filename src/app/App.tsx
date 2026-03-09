@@ -22,9 +22,9 @@ export function App() {
   return (
     <GameScreen
       state={controller.state}
+      timer={controller.timer}
       onRestart={controller.restartGame}
       onSelectChoice={controller.playRound}
     />
   );
 }
-

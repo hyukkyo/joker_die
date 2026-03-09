@@ -12,6 +12,8 @@ export function createInitialGameState(): GameState {
     playerHp: INITIAL_HP,
     computerHp: INITIAL_HP,
     remainingTime: INITIAL_TIME_LIMIT,
+    isChoiceLocked: true,
+    isComputerThinking: false,
     playerChoice: null,
     computerChoice: null,
     drawStreak: 0,
@@ -22,4 +24,3 @@ export function createInitialGameState(): GameState {
     endReason: "none",
   };
 }
-
